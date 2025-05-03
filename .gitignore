@@ -1,0 +1,8 @@
+*.log
+*.tmp
+
+scripts/data/elasticsearch/
+scripts/data/kafka/
+
+venv/
+.env

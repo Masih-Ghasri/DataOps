@@ -1,0 +1,5 @@
+[
+  {"id": "123", "full_name": "Ali", "timestamp": "2025/01/31 12:34:56", "active": "true", "extra_field": "remove_me"},
+  {"id": "124", "full_name": "", "timestamp": "2025-01-31T14:20:00Z", "active": "false", "extra_field": "ignore"},
+  {"id": "125", "full_name": "Sara", "timestamp": "2025/02/01 09:15:30", "active": "true", "extra_field": "delete"}
+]
