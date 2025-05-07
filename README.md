@@ -1,8 +1,8 @@
 # Data Pipeline with Kafka, Logstash, Elasticsearch, and Kibana
 
-این پروژه یک خط لوله داده را پیاده‌سازی می‌کند که داده‌های JSON خام را از طریق Kafka و Logstash پردازش کرده و برای نمایش در Kibana در Elasticsearch ذخیره می‌کند.
+This project implements a data pipeline that processes raw JSON data through Kafka and Logstash, storing it in Elasticsearch for visualization in Kibana.
 
-## ساختار پروژه
+## Project Structure
 
 ```
 .
@@ -17,53 +17,53 @@
 └── README.md
 ```
 
-## پیش‌نیازها
+## Prerequisites
 
-* Docker و Docker Compose نصب شده روی سیستم شما
-* Python 3.x (برای اجرای اسکریپت تولیدکننده)
+* Docker and Docker Compose installed on your system
+* Python 3.x (for running the producer script)
 
-## نحوه اجرای پروژه
+## How to Run the Project
 
-1. **راه‌اندازی سرویس‌ها**:
+1. **Start the services**:
 ```bash
 docker compose up -d
 ```
 
-2. **صبر کنید تا همه سرویس‌ها راه‌اندازی شوند** (ممکن است چند دقیقه طول بکشد). می‌توانید وضعیت را با این دستور بررسی کنید:
+2. **Wait for all services to start up** (this may take a few minutes). You can check the status with:
 ```bash
 docker compose logs -f
 ```
 
-3. **اسکریپت تولیدکننده Python را اجرا کنید** تا داده‌ها را به Kafka ارسال کنید:
+3. **Run the Python producer script** to send data to Kafka:
 ```bash
 python scripts/producer.py
 ```
 
-4. **دسترسی به Kibana** برای مشاهده داده‌های پردازش شده:
-    * مرورگر خود را باز کنید و به آدرس: `http://localhost:5601` بروید
-    * در منوی سمت چپ به "Discover" بروید
-    * الگوی ایندکس "test_pipeline" را انتخاب کنید
+4. **Access Kibana** to view the processed data:
+    * Open your browser and go to: `http://localhost:5601`
+    * Navigate to "Discover" in the left menu
+    * Select the "test_pipeline" index pattern
 
-## جزئیات پردازش داده
+## Data Processing Details
 
-خط لوله تبدیل‌های زیر را انجام می‌دهد:
+The pipeline performs the following transformations:
 
-1. **تبدیل انواع داده**:
-    * تبدیل `id` از رشته به عدد صحیح
-    * تبدیل `active` از رشته به بولین
-    * مقادیر خالی `full_name` به `null` تنظیم می‌شوند
+1. **Data Type Conversions**:
+    * Convert `id` from string to integer
+    * Convert `active` from string to boolean
+    * Empty `full_name` values are set to `null`
 
-2. **تغییر نام و حذف فیلدها**:
-    * `full_name` به `name` تغییر نام داده می‌شود
-    * `extra_field` کاملاً حذف می‌شود
+2. **Field Renaming and Removal**:
+    * `full_name` is renamed to `name`
+    * `extra_field` is completely removed
 
-3. **استانداردسازی مهر زمانی**:
-    * تبدیل فرمت‌های مختلف زمانی به فرمت ISO8601
-    * ذخیره در Elasticsearch به عنوان فیلد `@timestamp`
+3. **Timestamp Standardization**:
+    * Convert various time formats to ISO8601 format
+    * Store in Elasticsearch as `@timestamp` field
 
-## خروجی مورد انتظار
+## Expected Output
 
-داده‌های پردازش شده در Elasticsearch به این شکل خواهد بود:
+The processed data in Elasticsearch will look like this:
 
 ```json
 [
@@ -73,36 +73,36 @@ python scripts/producer.py
 ]
 ```
 
-## مراحل تأیید
+## Verification Steps
 
-1. بررسی کنید که هر 3 رکورد در Kibana نمایش داده شوند
-2. تأیید کنید که:
-    * همه شناسه‌ها عدد هستند (نه رشته)
-    * نام خالی به صورت null نمایش داده می‌شود
-    * همه مهرهای زمانی در فرمت ISO هستند
-    * "extra_field" موجود نیست
-    * وضعیت فعال به صورت true/false نمایش داده می‌شود (نه رشته)
+1. Check that all 3 records appear in Kibana
+2. Verify that:
+    * All IDs are numbers (not strings)
+    * Empty names are displayed as null
+    * All timestamps are in ISO format
+    * "extra_field" is not present
+    * Active status is displayed as true/false (not string)
 
-## عیب‌یابی
+## Troubleshooting
 
-اگر با مشکلاتی مواجه شدید:
+If you encounter issues:
 
-1. لاگ‌های کانتینر را بررسی کنید: `docker-compose logs -f [service_name]`
-2. تأیید کنید که همه کانتینرها در حال اجرا هستند: `docker-compose ps`
-3. مطمئن شوید که اسکریپت تولیدکننده می‌تواند به Kafka متصل شود (پورت 29092 را بررسی کنید)
-4. ایندکس‌های Elasticsearch را بررسی کنید: `curl http://localhost:9200/_cat/indices?v`
+1. Check container logs: `docker-compose logs -f [service_name]`
+2. Verify all containers are running: `docker-compose ps`
+3. Make sure the producer script can connect to Kafka (check port 29092)
+4. Check Elasticsearch indices: `curl http://localhost:9200/_cat/indices?v`
 
-## پاکسازی
+## Cleanup
 
-برای توقف و حذف همه کانتینرها:
+To stop and remove all containers:
 
 ```bash
 docker-compose down
 ```
 
-## نکات پیاده‌سازی
+## Implementation Notes
 
-* خط لوله، فرمت‌های مختلف تاریخ را مدیریت کرده و آنها را به فرمت استاندارد ISO تبدیل می‌کند
-* رشته‌های خالی به درستی به مقادیر null تبدیل می‌شوند
-* راه‌اندازی شامل ایجاد خودکار الگوی ایندکس Kibana است
-* بررسی‌های سلامت، شروع سرویس‌ها را به ترتیب صحیح تضمین می‌کنند
+* The pipeline handles various date formats and converts them to standard ISO format
+* Empty strings are properly converted to null values
+* Setup includes automatic creation of Kibana index pattern
+* Health checks ensure services start in the correct order
